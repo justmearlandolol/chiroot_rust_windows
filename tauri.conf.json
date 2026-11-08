@@ -1,0 +1,44 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Chiroot",
+  "version": "1.0.0",
+  "identifier": "id.chiroot.desktop",
+  "mainBinaryName": "Chiroot",
+  "build": {
+    "beforeDevCommand": "",
+    "beforeBuildCommand": "",
+    "devUrl": null,
+    "frontendDist": null
+  },
+  "app": {
+    "windows": [],
+    "withGlobalTauri": false,
+    "security": {
+      "csp": null,
+      "devtools": false,
+      "assetProtocol": {
+        "enable": false,
+        "scope": []
+      }
+    }
+  },
+  "bundle": {
+    "active": false,
+    "publisher": "Chiroot",
+    "copyright": "Copyright (c) 2025 Chiroot",
+    "category": "Music",
+    "shortDescription": "Chiroot",
+    "longDescription": "Chiroot — desktop client for the Chiroot audio player.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      }
+    }
+  }
+}

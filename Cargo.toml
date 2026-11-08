@@ -1,0 +1,29 @@
+[package]
+name = "Chiroot"
+version = "1.0.0"
+description = "Chiroot desktop application for Windows"
+authors = ["Chiroot"]
+edition = "2021"
+rust-version = "1.77.2"
+default-run = "Chiroot"
+
+# The binary must be named `Chiroot.exe`, so the bin target is declared
+# explicitly (it keeps working even if the package is ever renamed).
+[[bin]]
+name = "Chiroot"
+path = "src/main.rs"
+
+[dependencies]
+tauri = { version = "2.12.5", features = [] }
+tauri-plugin-opener = "2.7.2"
+serde_json = "1"
+
+[build-dependencies]
+tauri-build = { version = "2.7.4", features = [] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

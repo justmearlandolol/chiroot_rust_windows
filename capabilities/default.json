@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Permissions for the Chiroot window. No `remote` entry is declared, so this capability only applies to the app's own pages (the built-in connection error screen). The remote Chiroot website has no IPC access at all, and no filesystem or shell permission is granted anywhere.",
+  "windows": ["main"],
+  "permissions": ["opener:default"]
+}

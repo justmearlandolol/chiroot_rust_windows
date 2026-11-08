@@ -1,0 +1,72 @@
+name: Build Chiroot (Windows x64)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  build-windows:
+    name: Build Chiroot.exe (Windows x64)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain (stable, x86_64-pc-windows-msvc)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ". -> target"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Pillow
+        run: python -m pip install --upgrade pip pillow
+
+      - name: Generate the Windows icon from favicon.png
+        run: python scripts/generate-icons.py
+
+      - name: Verify required assets
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($file in @('favicon.png', 'assets\error-sign.png', 'icons\icon.ico', 'src\main.rs')) {
+            if (-not (Test-Path -LiteralPath $file)) {
+              throw "Missing required file: $file"
+            }
+          }
+          Write-Host 'All required files are present.'
+
+      - name: Build Chiroot.exe (release)
+        run: cargo build --release --target x86_64-pc-windows-msvc
+
+      - name: Package the portable executable
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Copy-Item -LiteralPath 'target\x86_64-pc-windows-msvc\release\Chiroot.exe' -Destination 'dist\Chiroot.exe'
+          if (-not (Test-Path -LiteralPath 'dist\Chiroot.exe')) {
+            throw 'Chiroot.exe was not produced by the build.'
+          }
+          Get-Item -LiteralPath 'dist\Chiroot.exe' | Select-Object Name, Length, LastWriteTime | Format-List
+
+      - name: Upload Chiroot-Windows-x64 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Chiroot-Windows-x64
+          path: dist/Chiroot.exe
+          if-no-files-found: error
