@@ -2,7 +2,7 @@ name: Build Chiroot (Windows x64)
 
 on:
   push:
-    branches: ["**"]
+    branches: [main]
   workflow_dispatch:
 
 env:
@@ -13,9 +13,6 @@ jobs:
   build-windows:
     name: Build Chiroot.exe (Windows x64)
     runs-on: windows-latest
-    permissions:
-      contents: read
-      issues: write
 
     steps:
       - name: Checkout repository
@@ -54,20 +51,7 @@ jobs:
           Write-Host 'All required files are present.'
 
       - name: Build Chiroot.exe (release)
-        shell: pwsh
-        continue-on-error: true
-        run: |
-          cargo build --release --target x86_64-pc-windows-msvc *>&1 | Tee-Object -FilePath build-log.txt
-          "EXITCODE=$LASTEXITCODE" | Out-File -Append -FilePath build-log.txt
-
-      - name: Publish build log (debug)
-        if: always()
-        shell: pwsh
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          if (-not (Test-Path -LiteralPath build-log.txt)) { "no build log" | Out-File build-log.txt }
-          gh issue create --title "Build log (run ${{ github.run_number }})" --body-file build-log.txt
+        run: cargo build --release --target x86_64-pc-windows-msvc
 
       - name: Package the portable executable
         shell: pwsh
