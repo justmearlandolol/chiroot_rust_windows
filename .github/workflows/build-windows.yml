@@ -2,7 +2,7 @@ name: Build Chiroot (Windows x64)
 
 on:
   push:
-    branches: [main]
+    branches: ["**"]
   workflow_dispatch:
 
 env:
