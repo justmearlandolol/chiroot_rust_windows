@@ -13,6 +13,9 @@ jobs:
   build-windows:
     name: Build Chiroot.exe (Windows x64)
     runs-on: windows-latest
+    permissions:
+      contents: read
+      issues: write
 
     steps:
       - name: Checkout repository
@@ -60,13 +63,11 @@ jobs:
       - name: Publish build log (debug)
         if: always()
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if (-not (Test-Path -LiteralPath build-log.txt)) { exit 0 }
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f build-log.txt
-          git commit -m "build log run ${{ github.run_number }} [skip ci]"
-          git push origin "HEAD:${{ github.ref_name }}"
+          if (-not (Test-Path -LiteralPath build-log.txt)) { "no build log" | Out-File build-log.txt }
+          gh issue create --title "Build log (run ${{ github.run_number }})" --body-file build-log.txt
 
       - name: Package the portable executable
         shell: pwsh
