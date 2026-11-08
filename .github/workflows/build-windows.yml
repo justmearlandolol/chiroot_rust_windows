@@ -51,7 +51,22 @@ jobs:
           Write-Host 'All required files are present.'
 
       - name: Build Chiroot.exe (release)
-        run: cargo build --release --target x86_64-pc-windows-msvc
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          cargo build --release --target x86_64-pc-windows-msvc *>&1 | Tee-Object -FilePath build-log.txt
+          "EXITCODE=$LASTEXITCODE" | Out-File -Append -FilePath build-log.txt
+
+      - name: Publish build log (debug)
+        if: always()
+        shell: pwsh
+        run: |
+          if (-not (Test-Path -LiteralPath build-log.txt)) { exit 0 }
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f build-log.txt
+          git commit -m "build log run ${{ github.run_number }} [skip ci]"
+          git push origin "HEAD:${{ github.ref_name }}"
 
       - name: Package the portable executable
         shell: pwsh
